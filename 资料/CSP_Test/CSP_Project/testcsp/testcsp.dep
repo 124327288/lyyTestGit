@@ -1,0 +1,7 @@
+# Microsoft Developer Studio Generated Dependency File, included by testcsp.mak
+
+.\testcsp.c : \
+	".\wincrypt.h"\
+	"c:\program files\microsoft visual studio\vc98\include\basetsd.h"\
+	"c:\program files\microsoft visual studio\vc98\include\wincrypt.h"\
+	

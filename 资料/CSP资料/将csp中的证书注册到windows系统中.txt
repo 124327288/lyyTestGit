@@ -1,0 +1,49 @@
+USBKey是一种USB接口的硬件设备。如坚石诚信的ET199Auto，内置16位国外进口高性能智能卡芯片，有一定的存储空间，可以存储用户的私钥以及数字证书，利用USBKey内置的RSA公私钥算法实现对用户身份的认证。由于用户私钥保存在ET199Auto中，同时智能卡可以很好的防止物理攻击/边频攻击等窃取手段，从而有效保证任何方式都无法读取ET199Auto中的私钥，因此保证了用户认证的安全性。
+目前，USBKey已广泛应用在网上银行，网上办公，证券交易，网络游戏等众多系统中。那么USBKey又怎么与应用系统连接而进行身份认证的呢？实际上，USBKey中存储者代表用户身份的数字证书。一张数字证书包括：证书信息＋公钥＋私钥，其中证书＋公钥是可以公开的，私钥是在USBKey中，任何人都无法获取的。当USBKey插入计算机后，USBKey厂商提供的中间件程序会将证书信息注册到Windows系统中，应用系统中在认证时通过Windows系统找到用户证书，该证书通过USBKey厂商的中间件找到USBKey中对应的私钥，然后在USBKey中使用私钥进行签名运算，将结果传给服务器认证。过程如下：
+网银àWindows系统中用户证书àUSBKey中间件à私钥签名à服务器验证
+本篇文章就介绍一下如何使用微软CAPI接口完成将USBKey中的证书注册到Windows系统中。
+（1） 获取CSP句柄。
+CryptAcquireContext( &hTokenProv,NULL,"EnterSafe ET199Auto CSP V1.0",PROV_RSA_FULL,NULL)
+（2） 获取USBKey内密钥句柄，这时要注意锁内密钥的类型是签名密钥（AT_SIGNATURE）或者交换密（AT_KEYEXCHANGE）。
+         CryptGetUserKey(hTokenProv,AT_KEYEXCHANGE,&hKeyCAPI)
+（3） 获取证书数据（只是证书信息数据，不包括私钥），这时可以通过两次调用，先获取证书数据的长度，分配空间，然后再调用一次。
+        CryptGetKeyParam(hKeyCAPI, KP_CERTIFICATE, pbCert, &dwCertLen, 0)
+（4） 创建CERT_CONTEXT结构
+  pCertContext =
+
+CertCreateCertificateContext(PKCS_7_ASN_ENCODING | X509_ASN_ENCODING,
+
+                                            pbCert,
+                                            dwCertLen) ;
+（5） 打开MY存储区，这个就是Windows系统中“个人”证书存放的区域。
+hSysStore = CertOpenStore(
+                                          CERT_STORE_PROV_SYSTEM_REGISTRY,
+                                          0,
+                                          0,
+                                          CERT_SYSTEM_STORE_CURRENT_USER,
+                                          L"MY");
+（6） 设置证书上下文属性。这时要先声明CRYPT_KEY_PROV_INFO结构
+CRYPT_KEY_PROV_INFO ckpi = {0};
+ckpi.pwszProvName = L" EnterSafe ET199Auto CSP V1.0";
+ckpi.pwszContainerName = pbWideContainer;
+ckpi.dwProvType = PROV_RSA_FULL;
+ckpi.dwKeySpec = AT_KEYEXCHANGE;
+ckpi.dwFlags = CERT_KEY_CONTEXT_PROP_ID;
+ckpi.cProvParam = 0;
+ckpi.rgProvParam = NULL;
+CertSetCertificateContextProperty(
+                                                    pCertContext,
+                                                    CERT_KEY_PROV_INFO_PROP_ID,
+
+                                                    CERT_STORE_NO_CRYPT_RELEASE_FLAG,
+
+                                                    &ckpi)
+（7） 将证书注册到Windows系统中。
+CertAddCertificateContextToStore(
+                                                      hSysStore,
+                                                      pCertContext,
+                                                      CERT_STORE_ADD_REPLACE_EXISTING,
+                                                      NULL);
+（8） 释放CSP句柄。
+CryptReleaseContext(hTokenProv,0)
+通过上述步骤就可以将ET199Auto中的证书注册到Windows系统中了。我们可以在IE--Internet选项--内容--证书--个人下面查看到ET199Auto中的证书。

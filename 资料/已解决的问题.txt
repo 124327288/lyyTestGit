@@ -1,0 +1,10 @@
+1.CryptGetKeyParam(hKeyCAPI,KP_CERTIFICATE,pCertInfo,&dwCertLen,0) //接口取不到证书信息，是因为在ca中心申请证书后，没有写入到csp中。
+
+2.接口
+CertOpenSystemStore(
+		NULL,
+ 		L"ca"))中的第二个参数不能以参数的形式传递，只能以具体的字符串的形式传递。这样操作后，就可以顺利的枚举证书库中的证书了。
+3.CertEnumCertificatesInStore(
+		hCertStore,
+		pCertContext)) 枚举证书库中的证书，每次只能显示一个。
+

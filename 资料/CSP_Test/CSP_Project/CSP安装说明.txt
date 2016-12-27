@@ -1,0 +1,16 @@
+##########################################
+# CSP 安装说明
+##########################################
+步骤说明：
+1.如果系统是xp sp3的环境，在安全模式下将lib下
+  advapi32_sp3.dll改名为advapi32.dll，替换掉system32
+  目录下的advapi32.dll文件，重启系统；
+
+2.将lib目录下cspSign.exe(模拟微软对CSP签名)、csp.dll、
+  InterCsp.dll、InstallCspDll.bat文件拷贝到system32目录下；
+
+3.运行system32目录下InstallCspDll.bat文件完成csp的签名和注册；
+
+备注说明：
+以上3个步骤是基于CSP没有被微软正式签名的注册步骤，如果CSP正式被
+微软签名则直接运行"regsvr32 c:\windows\system32\csp.dll"命令即可。

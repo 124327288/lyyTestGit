@@ -1,0 +1,43 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: cspi - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x804 /fo"../temp/csp/debug/cspi.res" /d "_DEBUG" "F:\ZZZ_TSM_SVN\TSM\CSP_Test\CSP_Project\cspi\cspi.rc"" 
+Creating temporary file "C:\DOCUME~1\yww\LOCALS~1\Temp\RSP48.tmp" with contents
+[
+/nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "CSPI_EXPORTS" /Fp"../temp/csp/debug/cspi.pch" /YX /Fo"../temp/csp/debug/" /Fd"../temp/csp/debug/" /FD /GZ /c 
+"F:\ZZZ_TSM_SVN\TSM\CSP_Test\CSP_Project\cspi\load_inter.c"
+"F:\ZZZ_TSM_SVN\TSM\CSP_Test\CSP_Project\cspi\autoreg.cpp"
+"F:\ZZZ_TSM_SVN\TSM\CSP_Test\CSP_Project\cspi\cspdk.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\yww\LOCALS~1\Temp\RSP48.tmp" 
+Creating temporary file "C:\DOCUME~1\yww\LOCALS~1\Temp\RSP49.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:yes /pdb:"../temp/csp/debug/csp.pdb" /debug /machine:I386 /def:".\cspi.def" /out:"../lib/csp.dll" /implib:"../temp/csp/debug/csp.lib" /pdbtype:sept 
+\ZZZ_TSM_SVN\TSM\CSP_Test\CSP_Project\temp\csp\debug\load_inter.obj
+\ZZZ_TSM_SVN\TSM\CSP_Test\CSP_Project\temp\csp\debug\autoreg.obj
+\ZZZ_TSM_SVN\TSM\CSP_Test\CSP_Project\temp\csp\debug\cspdk.obj
+\ZZZ_TSM_SVN\TSM\CSP_Test\CSP_Project\temp\csp\debug\cspi.res
+]
+Creating command line "link.exe @C:\DOCUME~1\yww\LOCALS~1\Temp\RSP49.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+load_inter.c
+autoreg.cpp
+cspdk.c
+Linking...
+   Creating library ../temp/csp/debug/csp.lib and object ../temp/csp/debug/csp.exp
+csp.exp : warning LNK4070: /OUT:CSPI.dll directive in .EXP differs from output filename "../lib/csp.dll"; ignoring directive
+
+
+
+<h3>Results</h3>
+csp.dll - 0 error(s), 1 warning(s)
+</pre>
+</body>
+</html>

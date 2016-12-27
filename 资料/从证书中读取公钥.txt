@@ -1,0 +1,1 @@
+CER证书先 CertCreateCertificateContext(X509_ASN_ENCODING, VeriftyCertByte(0), UBound(VeriftyCertByte) + 1)，然后CryptAcquireCertificatePrivateKey 创建CSP 然后CryptGetUserKey(phCryptProv, AT_KEYEXCHANGE, pHKey)拿到密钥句柄，然后验签就可以了

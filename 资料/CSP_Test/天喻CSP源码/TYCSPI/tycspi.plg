@@ -1,0 +1,127 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: tycspi - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "E:\TEMP\RSP1F9.tmp" with contents
+[
+/nologo /MT /W3 /GX /O2 /I ".\Inc\Crypto" /I ".\Inc\Common" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "CSPBASE_EXPORTS" /FR"Release/" /Fp"Release/tycspi.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\Z_TSM_Other\CSP Resource\CSP源码\源码\TYCSPI\BaseFile\CryptSPI.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP源码\源码\TYCSPI\BaseFile\CSPAsymmetricalKey.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP源码\源码\TYCSPI\BaseFile\CSPDes.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP源码\源码\TYCSPI\BaseFile\CSPKey.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP源码\源码\TYCSPI\BaseFile\CSPRc2Key.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP源码\源码\TYCSPI\BaseFile\CSPRsaPrk.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP源码\源码\TYCSPI\BaseFile\CSPSCB2.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP源码\源码\TYCSPI\BaseFile\CSPSSF33.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP源码\源码\TYCSPI\BaseFile\DERCoding.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP源码\源码\TYCSPI\BaseFile\HashObject.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP源码\源码\TYCSPI\BaseFile\HelperFunc.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP源码\源码\TYCSPI\BaseFile\KeyContainer.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP源码\源码\TYCSPI\BaseFile\Reader.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP源码\源码\TYCSPI\BaseFile\Reader2.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP源码\源码\TYCSPI\BaseFile\UserFile.cpp"
+]
+Creating command line "cl.exe @E:\TEMP\RSP1F9.tmp" 
+<h3>Output Window</h3>
+Compiling...
+CryptSPI.cpp
+CSPAsymmetricalKey.cpp
+CSPDes.cpp
+CSPKey.cpp
+CSPRc2Key.cpp
+CSPRsaPrk.cpp
+CSPSCB2.cpp
+CSPSSF33.cpp
+DERCoding.cpp
+HashObject.cpp
+HelperFunc.cpp
+KeyContainer.cpp
+Reader.cpp
+Reader2.cpp
+UserFile.cpp
+Generating Code...
+Creating temporary file "E:\TEMP\RSP1FA.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:no /pdb:"Release/tycspi.pdb" /machine:I386 /def:".\tycspi.def" /out:"./release/tycspi.dll" /implib:"Release/tycspi.lib" /libpath:".\Lib" 
+".\Release\tycspi.obj"
+".\Release\CryptSPI.obj"
+".\Release\CSPAsymmetricalKey.obj"
+".\Release\CSPDes.obj"
+".\Release\CSPEccPrk.obj"
+".\Release\CSPEccPuk.obj"
+".\Release\CSPKey.obj"
+".\Release\CSPObject.obj"
+".\Release\CSPRc2Key.obj"
+".\Release\CSPRc4Key.obj"
+".\Release\CSPRsaPrk.obj"
+".\Release\CSPRsaPuk.obj"
+".\Release\CSPSCB2.obj"
+".\Release\CSPSSF33.obj"
+".\Release\CSPSymmetricalKey.obj"
+".\Release\DERCoding.obj"
+".\Release\DERTool.obj"
+".\Release\HashObject.obj"
+".\Release\HelperFunc.obj"
+".\Release\KeyContainer.obj"
+".\Release\Mac.obj"
+".\Release\Modifier.obj"
+".\Release\Reader.obj"
+".\Release\Reader2.obj"
+".\Release\scb2.obj"
+".\Release\ssf33.obj"
+".\Release\StdAfx.obj"
+".\Release\Support.obj"
+".\Release\UserFile.obj"
+".\Release\tycspi.res"
+]
+Creating command line "link.exe @E:\TEMP\RSP1FA.tmp"
+<h3>Output Window</h3>
+Linking...
+   Creating library Release/tycspi.lib and object Release/tycspi.exp
+Creating temporary file "E:\TEMP\RSP1FE.tmp" with contents
+[
+/nologo /o"Release/tycspi.bsc" 
+".\Release\StdAfx.sbr"
+".\Release\tycspi.sbr"
+".\Release\CryptSPI.sbr"
+".\Release\CSPAsymmetricalKey.sbr"
+".\Release\CSPDes.sbr"
+".\Release\CSPEccPrk.sbr"
+".\Release\CSPEccPuk.sbr"
+".\Release\CSPKey.sbr"
+".\Release\CSPObject.sbr"
+".\Release\CSPRc2Key.sbr"
+".\Release\CSPRc4Key.sbr"
+".\Release\CSPRsaPrk.sbr"
+".\Release\CSPRsaPuk.sbr"
+".\Release\CSPSCB2.sbr"
+".\Release\CSPSSF33.sbr"
+".\Release\CSPSymmetricalKey.sbr"
+".\Release\DERCoding.sbr"
+".\Release\DERTool.sbr"
+".\Release\HashObject.sbr"
+".\Release\HelperFunc.sbr"
+".\Release\KeyContainer.sbr"
+".\Release\Mac.sbr"
+".\Release\Modifier.sbr"
+".\Release\Reader.sbr"
+".\Release\Reader2.sbr"
+".\Release\scb2.sbr"
+".\Release\ssf33.sbr"
+".\Release\Support.sbr"
+".\Release\UserFile.sbr"]
+Creating command line "bscmake.exe @E:\TEMP\RSP1FE.tmp"
+Creating browse info file...
+<h3>Output Window</h3>
+
+
+
+<h3>Results</h3>
+tycspi.dll - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

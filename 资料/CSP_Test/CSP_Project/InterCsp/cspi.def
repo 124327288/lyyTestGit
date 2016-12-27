@@ -1,0 +1,34 @@
+LIBRARY INTERCSP
+
+DESCRIPTION 'Crypto Service Provider'
+
+EXPORTS
+
+CPAcquireContext_Internal
+CPReleaseContext_Internal
+CPGenKey_Internal
+CPDeriveKey_Internal
+
+CPDestroyKey_Internal
+CPSetKeyParam_Internal
+CPGetKeyParam_Internal
+CPExportKey_Internal
+
+CPImportKey_Internal
+CPEncrypt_Internal
+CPDecrypt_Internal
+CPCreateHash_Internal
+
+CPHashData_Internal
+CPHashSessionKey_Internal
+CPDestroyHash_Internal
+CPSignHash_Internal
+
+CPVerifySignature_Internal
+CPGenRandom_Internal
+CPGetUserKey_Internal
+CPSetProvParam_Internal
+
+CPGetProvParam_Internal
+CPSetHashParam_Internal
+CPGetHashParam_Internal

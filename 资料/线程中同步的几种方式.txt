@@ -1,0 +1,5 @@
+临界区：一种保证在某一时刻只有一个线程能访问数据的简便办法。它只可以在同一进程内部使 用。主要API函数有，产生临界区：InitializeCriticalSection，删除临界区：DeleteCriticalSection，进 入临界区：EnterCriticalSection，退出临界区：LeaveCriticalSection。
+互斥对象：互斥对象跟临界区相似，但它不仅仅能够在同一应用程序不同线程中实现资源的安全共 享，而且可以在不同应用程序的线程之间实现对资源的安全共享，当然下面两者也有这个特点。主要API函数有，创建互斥量： CreateMutex，打开一个存在的互斥量： OpenMutex，释放互斥量的使用权：ReleaseMutex，关闭互斥量： CloseHandle。
+信标：使用信号量（信标）最重要用途是：信号允许多个线程同时使用共享资源，它指出了同时访问共享资源的线程最大数目。它的API函数和使用方法都与互斥对象相似，如创建信号灯：CreateSemaphore，传入的参数可以指定信号灯的初始值。
+事件：用来通知其他进程/线程某件操作已经完成。API函数有创建，打开事件对象等，特殊点 的是可以用函数SetEvent人工设置事件为有无信号状态，因此创建事件对象时可以有两种方式，一种为自动重置，一种为人工重置。只有人工重置方式创建 的事件对象才能正确使用函数SetEvent。
+鉴于本套题考的是VC，有必要说明的是在MFC中对于各种同步对象都提供了相对应的类 CCtiticalSection,CMutex,CSemaphore ,CEvent，另外为使用等待功能封装了两个类：CSingleLock和CMultiLock。这些类方便了使用这些同步对象。

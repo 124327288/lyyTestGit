@@ -1,0 +1,103 @@
+; tycspi.def : Declares the module parameters for the DLL.
+
+;LIBRARY      "tycspi"
+DESCRIPTION  'tycspi Windows Dynamic Link Library'
+
+EXPORTS
+    ; Explicit exports can go here
+
+	CPAcquireContext			@1
+	CPReleaseContext			@2
+	CPGetProvParam				@3
+	CPSetProvParam				@4
+	CPGenKey					@5
+	CPDuplicateKey				@6
+	CPDeriveKey					@7
+	CPDestroyKey				@8
+	CPDestroyKeyPair			@9
+	CPGetKeyParam				@10
+	CPSetKeyParam				@11
+	CPExportKey					@12
+	CPImportKey					@13
+	CPGetUserKey				@14
+	CPGenRandom					@15
+	CPDecrypt					@16
+	CPEncrypt					@17
+	CPCreateHash				@18
+	CPDuplicateHash				@19
+	CPDestroyHash				@20
+	CPGetHashParam				@21
+	CPSetHashParam				@22
+	CPHashData					@23
+	CPHashSessionKey			@24
+	CPSignHash					@25
+	CPVerifySignature			@26
+	CPSignRecover				@27
+	CPVerifyRecover				@28
+	CPLogin						@29		NONAME
+	CPLogout					@30		NONAME
+	CPChangePIN					@31		NONAME
+	CPUnlockPIN					@32		NONAME
+	CPAcquireUserFile			@33		NONAME
+	CPReleaseUserFile			@34		NONAME
+	CPReadUserFile				@35		NONAME
+	CPWriteUserFile				@36		NONAME
+	CPGetUserFileSize			@37		NONAME
+	CPGetTokenInfo				@38		NONAME
+	CPSetTokenInfo				@39		NONAME
+	CPFormat					@40		NONAME
+	CPFinalize					@41		NONAME
+	CPAcquireContext2			@42		NONAME
+	CPAcquireUserFile2			@43		NONAME
+	g_ByteOrderMode				@44		DATA
+	CPExportPublicKeyDERCode	@45		NONAME
+	CPGetUserType				@46		NONAME
+	CPRSARawDecrypt				@47		NONAME
+	CPRSARawEncrypt				@48		NONAME
+	CPGetCSPCount				@49		NONAME
+	OpenKeyContainer			@50		NONAME
+	ExportPublicKey				@51		NONAME
+	ExportPrivateKey			@52		NONAME
+	DecodeAndCreatePublicKey	@53		NONAME
+	DecodeAndCreatePrivateKey	@54		NONAME
+	SymmCipher					@55		NONAME
+	PublicKeyEncrypt			@56		NONAME
+	PrivateKeyDecrypt			@57		NONAME
+	CPGetReaderName				@58		NONAME
+	CPFormat2					@59		NONAME
+	CPFinalize2					@60		NONAME
+	DecodeAndCreatePrivateKey2	@61		NONAME
+	CPGetUserFileName			@62		NONAME
+	CPGetUserFileNameList		@63		NONAME
+	CPBase64Encode				@64		NONAME
+	CPBase64Decode				@65		NONAME
+	CPSoftHash					@66		NONAME
+	CPSetByteOrderMode			@67		NONAME
+	CPFormat3					@68		NONAME
+	CPFinalize3					@69		NONAME
+	CPGetE2Size					@70		NONAME
+	CPGetE2Size2				@71		NONAME
+	CPGetE2Size3				@72		NONAME
+	CPGetPinRetryInfo			@73		NONAME
+	CPEraseEE					@74		NONAME
+	CPEraseEE2					@75		NONAME
+	CPSendCommand				@76		NONAME
+	CPSendCommand2				@77		NONAME
+	CPSendCommand3				@78		NONAME
+	CPCheckCardIsExist			@79		NONAME
+	CPCheckCardIsExist2			@80		NONAME
+	CPCheckCardIsExist3			@81		NONAME
+	CPIsUseReaderIndex			@82		NONAME
+	CPSetUseReaderIndex			@83		NONAME
+	CPSetReaderEnumFlag			@84		NONAME
+	CPReGetTokenInfo			@85		NONAME
+	CPConnect					@86		NONAME
+	CPConnect2					@87		NONAME
+	CPIsFormatted				@88		NONAME
+	CPEraseEE3					@89		NONAME
+	CPGetATR					@90		NONAME
+	CPSelectReader				@100	NONAME
+	CPGetCosVer					@101	NONAME
+	CPIsSSF33Support			@102	NONAME
+	CPConnect1					@103	NONAME
+	CPResetCard					@104	NONAME

@@ -1,0 +1,20 @@
+ByteOrderMode g_ByteOrderMode = BOM_BIG_ENDIAN;
+
+BOOL APIENTRY DllMain( HANDLE hModule, 
+                       DWORD  ul_reason_for_call, 
+                       LPVOID lpReserved
+					 )
+{
+	if(ul_reason_for_call == DLL_PROCESS_ATTACH){
+		if(!g_theTYCSPManager.Initialize())
+			return FALSE;
+
+		g_rng.init();
+	}
+	else if(ul_reason_for_call == DLL_PROCESS_DETACH){
+		if(!g_theTYCSPManager.Finalize())
+			return FALSE;
+	}
+
+	return TRUE;
+}

@@ -1,0 +1,180 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: tyCSP - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x804 /fo"Debug/tyCSP.res" /d "_DEBUG" "D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\tyCSP.rc"" 
+Creating temporary file "C:\DOCUME~1\yww\LOCALS~1\Temp\RSP160A.tmp" with contents
+[
+/nologo /MTd /W3 /Gm /GX /ZI /Od /I ".\Inc\Crypto" /I ".\inc\common" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "_WINDLL" /FR"Debug/" /Fp"Debug/tyCSP.pch" /Yu"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\CryptSPI.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\CSPAsymmetricalKey.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\CSPDes.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\CSPEccPrk.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\CSPEccPuk.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\CSPKey.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\CSPObject.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\CSPRc2Key.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\CSPRc4Key.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\CSPRsaPrk.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\CSPRsaPuk.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\CSPSCB2.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\CSPSSF33.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\CSPSymmetricalKey.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\DERCoding.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\DERTool.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\GenKeyPairPromptDlg.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\HashObject.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\HelperFunc.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\KeyContainer.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\Mac.CPP"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\Modifier.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\OpenCardDlg.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\Reader.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\scb2.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\ssf33.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\tyCSP.cpp"
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\VerifyPIN.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\yww\LOCALS~1\Temp\RSP160A.tmp" 
+Creating temporary file "C:\DOCUME~1\yww\LOCALS~1\Temp\RSP160B.tmp" with contents
+[
+/nologo /MTd /W3 /Gm /GX /ZI /Od /I ".\Inc\Crypto" /I ".\inc\common" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "_WINDLL" /FR"Debug/" /Fp"Debug/tyCSP.pch" /Yc"stdafx.h" /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\yww\LOCALS~1\Temp\RSP160B.tmp" 
+Creating temporary file "C:\DOCUME~1\yww\LOCALS~1\Temp\RSP160C.tmp" with contents
+[
+/nologo /subsystem:windows /dll /incremental:yes /pdb:"Debug/tyCSP.pdb" /debug /machine:I386 /def:".\tyCSP.def" /out:"Debug/tyCSP.dll" /implib:"Debug/tyCSP.lib" /pdbtype:sept /libpath:".\lib" 
+".\Debug\CryptSPI.obj"
+".\Debug\CSPAsymmetricalKey.obj"
+".\Debug\CSPDes.obj"
+".\Debug\CSPEccPrk.obj"
+".\Debug\CSPEccPuk.obj"
+".\Debug\CSPKey.obj"
+".\Debug\CSPObject.obj"
+".\Debug\CSPRc2Key.obj"
+".\Debug\CSPRc4Key.obj"
+".\Debug\CSPRsaPrk.obj"
+".\Debug\CSPRsaPuk.obj"
+".\Debug\CSPSCB2.obj"
+".\Debug\CSPSSF33.obj"
+".\Debug\CSPSymmetricalKey.obj"
+".\Debug\DERCoding.obj"
+".\Debug\DERTool.obj"
+".\Debug\GenKeyPairPromptDlg.obj"
+".\Debug\HashObject.obj"
+".\Debug\HelperFunc.obj"
+".\Debug\KeyContainer.obj"
+".\Debug\Mac.obj"
+".\Debug\Modifier.obj"
+".\Debug\OpenCardDlg.obj"
+".\Debug\Reader.obj"
+".\Debug\scb2.obj"
+".\Debug\ssf33.obj"
+".\Debug\StdAfx.obj"
+".\Debug\tyCSP.obj"
+".\Debug\VerifyPIN.obj"
+".\Debug\tyCSP.res"
+]
+Creating command line "link.exe @C:\DOCUME~1\yww\LOCALS~1\Temp\RSP160C.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+StdAfx.cpp
+Compiling...
+CryptSPI.cpp
+CSPAsymmetricalKey.cpp
+CSPDes.cpp
+CSPEccPrk.cpp
+CSPEccPuk.cpp
+CSPKey.cpp
+CSPObject.cpp
+D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\CSPObject.cpp(2001) : warning C4005: 'SCARD_W_WRONG_CHV' : macro redefinition
+        c:\program files\microsoft sdk\include\winerror.h(26288) : see previous definition of 'SCARD_W_WRONG_CHV'
+D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\CSPObject.cpp(2002) : warning C4005: 'SCARD_W_CHV_BLOCKED' : macro redefinition
+        c:\program files\microsoft sdk\include\winerror.h(26297) : see previous definition of 'SCARD_W_CHV_BLOCKED'
+D:\Z_TSM_Other\CSP Resource\CSP开源资料\CSP源码\源码\CSP\CSPObject.cpp(2003) : warning C4005: 'SCARD_W_CARD_NOT_AUTHENTICATED' : macro redefinition
+        c:\program files\microsoft sdk\include\winerror.h(26324) : see previous definition of 'SCARD_W_CARD_NOT_AUTHENTICATED'
+CSPRc2Key.cpp
+CSPRc4Key.cpp
+CSPRsaPrk.cpp
+CSPRsaPuk.cpp
+CSPSCB2.cpp
+CSPSSF33.cpp
+CSPSymmetricalKey.cpp
+DERCoding.cpp
+DERTool.cpp
+GenKeyPairPromptDlg.cpp
+HashObject.cpp
+HelperFunc.cpp
+KeyContainer.cpp
+Generating Code...
+Compiling...
+Mac.CPP
+Modifier.cpp
+OpenCardDlg.cpp
+Reader.cpp
+scb2.cpp
+ssf33.cpp
+tyCSP.cpp
+VerifyPIN.cpp
+Generating Code...
+Linking...
+   Creating library Debug/tyCSP.lib and object Debug/tyCSP.exp
+Creating temporary file "C:\DOCUME~1\yww\LOCALS~1\Temp\RSP1610.tmp" with contents
+[
+/nologo /o"Debug/tyCSP.bsc" 
+".\Debug\StdAfx.sbr"
+".\Debug\CryptSPI.sbr"
+".\Debug\CSPAsymmetricalKey.sbr"
+".\Debug\CSPDes.sbr"
+".\Debug\CSPEccPrk.sbr"
+".\Debug\CSPEccPuk.sbr"
+".\Debug\CSPKey.sbr"
+".\Debug\CSPObject.sbr"
+".\Debug\CSPRc2Key.sbr"
+".\Debug\CSPRc4Key.sbr"
+".\Debug\CSPRsaPrk.sbr"
+".\Debug\CSPRsaPuk.sbr"
+".\Debug\CSPSCB2.sbr"
+".\Debug\CSPSSF33.sbr"
+".\Debug\CSPSymmetricalKey.sbr"
+".\Debug\DERCoding.sbr"
+".\Debug\DERTool.sbr"
+".\Debug\GenKeyPairPromptDlg.sbr"
+".\Debug\HashObject.sbr"
+".\Debug\HelperFunc.sbr"
+".\Debug\KeyContainer.sbr"
+".\Debug\Mac.sbr"
+".\Debug\Modifier.sbr"
+".\Debug\OpenCardDlg.sbr"
+".\Debug\Reader.sbr"
+".\Debug\scb2.sbr"
+".\Debug\ssf33.sbr"
+".\Debug\tyCSP.sbr"
+".\Debug\VerifyPIN.sbr"]
+Creating command line "bscmake.exe @C:\DOCUME~1\yww\LOCALS~1\Temp\RSP1610.tmp"
+Creating browse info file...
+<h3>Output Window</h3>
+Creating temporary file "C:\DOCUME~1\yww\LOCALS~1\Temp\RSP1611.bat" with contents
+[
+@echo off
+move        /Y                        %WINDIR%\system32\tycsp.dll          D:
+copy                         .\debug\tycsp.dll                         %WINDIR%\system32\
+]
+Creating command line "C:\DOCUME~1\yww\LOCALS~1\Temp\RSP1611.bat"
+copy                         .\debug\tycsp.dll                         %WINDIR%\system32\
+系统找不到指定的文件。
+已复制         1 个文件。
+
+
+
+<h3>Results</h3>
+tyCSP.dll - 0 error(s), 3 warning(s)
+</pre>
+</body>
+</html>

@@ -1,0 +1,19 @@
+del vf00.dat
+del flash.bin
+del test_tsp_log.txt
+del File_Data_Unenvelop
+del File_Data_Unseal
+del File_Data_Decrypt
+del system.data
+del file_tcm_pek_req
+del file_tcm_pek
+del file_pek_cert_01
+del file_pek_cert
+del file_tcm_pek_params
+del file_pik_cert_01
+del file_pik_cert
+del file_ca_key
+
+del *.suo
+del *.ilk
+del *.exp

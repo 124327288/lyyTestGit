@@ -1,0 +1,9 @@
+SCC = This is a Source Code Control file
+
+[tyCSP.dsp]
+SCC_Aux_Path = "\\tykey-vss\vssdb$\TYKEY"
+SCC_Project_Name = "$/Interfaces/StdPki/CSP", OEAAAAAA
+
+[tyCSP.dsw]
+SCC_Aux_Path = "\\tykey-vss\vssdb$\TYKEY"
+SCC_Project_Name = "$/Interfaces/StdPki/CSP", OEAAAAAA

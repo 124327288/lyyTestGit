@@ -1,0 +1,912 @@
+#ifndef JW_TCM_SERVICE_MODULE_H
+#define JW_TCM_SERVICE_MODULE_H
+
+#pragma pack(push)
+#pragma pack(1)
+
+#ifdef USES_WIN32
+
+#define _WINSOCKAPI_
+#include <windows.h>
+#endif
+
+#include "jwplatform.h"
+
+#include "trousers/tss/platform.h"
+#include "trousers/tss/tcs_typedef.h"
+#include "trousers/tss/tss_defines.h"
+#include "trousers/tss/tpm.h"
+#include "trousers/tss/tcs_structs.h"
+#include "trousers/trousers/trousers.h"
+
+#include "jwerror.h"
+#include "jwtcm.h"
+#include "tsm_const.h"
+
+#include "tsm_crypto.h"
+
+
+typedef struct tdDebugInternal
+{
+	struct tdDebugInternal* next;
+
+	unsigned long (STDCALL* DebugCallback)(struct tdDebugInternal*, ...);
+
+	unsigned long ver;
+	char* module;		// 模块名称
+	char* method;		// 函数名称
+	unsigned long result;	// 函数执行结果
+	unsigned long (STDCALL* add)(void* p);
+	unsigned long (STDCALL* del)(void** p);
+
+}DEBUGINTERNAL;
+
+#define SYMMETRIC_KEY_IV_SIZE                   (16)
+#define DEFAULT_SYMMETRIC_KEY_IV                ("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")
+#define MAX_SYMMETRIC_CRYPTO_DATA_SIZE          (512)
+#define MAX_ASYMMETRIC_ENCRYPT_DATA_SIZE        (256)
+#define MAX_ASYMMETRIC_DECRYPT_DATA_SIZE        (256 + 97 + 5)
+
+#define MAX_TCM_NUM_PCRS                        (24)
+#define MAX_TCM_NUM_AUTHS                       (4)
+#define MAX_TCM_NUM_DIRS                        (0)
+#define MAX_TCM_NUM_KEYS                        (1)
+//#define manufacturer
+
+//////////////////////////////////////////////////////////////////////////
+// 导出类型
+//////////////////////////////////////////////////////////////////////////
+
+typedef UINT32                  TSM_FLAG;
+typedef UINT32                  TSM_HOBJECT;
+typedef UINT32                  TSM_ALGORITHM_ID;
+typedef UINT32                  TSM_MIGRATE_SCHEME;
+typedef UINT32                  TSM_KEY_USAGE_ID;
+typedef UINT32                  TSM_KEY_ENC_SCHEME;
+typedef UINT32                  TSM_KEY_SIG_SCHEME;
+typedef UINT32                  TSM_EVENTTYPE;
+typedef UINT32                  TSM_COUNTER_ID;
+typedef UINT32                  TSM_RESULT;
+
+//////////////////////////////////////////////////////////////////////////
+// 对象类型
+//////////////////////////////////////////////////////////////////////////
+
+typedef TSM_HOBJECT             TSM_HCONTEXT;
+typedef TSM_HOBJECT             TSM_HPOLICY;
+typedef TSM_HOBJECT             TSM_HTCM;
+typedef TSM_HOBJECT             TSM_HKEY;
+typedef TSM_HOBJECT             TSM_HENCDATA;
+typedef TSM_HOBJECT             TSM_HPCRS;
+typedef TSM_HOBJECT             TSM_HHASH;
+typedef TSM_HOBJECT             TSM_HNVSTORE;
+typedef TSM_HOBJECT             TSM_HMIGDATA;
+typedef TSM_HOBJECT             TSM_HEXCHANGE;
+
+//////////////////////////////////////////////////////////////////////////
+// 数据结构
+//////////////////////////////////////////////////////////////////////////
+
+typedef struct tdTSM_ENVELOP 
+{
+    UINT32          encSymSize;
+    BYTE            encSym[256]; // 对TCM_STORE_SYMKEY结构加密后的数据缓冲区
+    UINT32          dataSize;
+    BYTE*           data;
+}TSM_ENVELOP;
+
+typedef struct tdTSM_PCR_EVENT
+{
+    TSM_VERSION     versionInfo;
+    UINT32          ulPcrIndex;
+    TSM_EVENTTYPE   eventType;
+    UINT32          ulPcrValueLength;
+    BYTE*           rgbPcrValue;
+    UINT32          ulEventLength;
+    BYTE*           rgbEvent;
+}TSM_PCR_EVENT;
+
+typedef struct tdTSM_EVENT_CERT
+{
+    TSM_VERSION     versionInfo;
+    UINT32          ulCertificateHashLength;
+    BYTE*           rgbCertificateHash;
+    UINT32          ulEntityDigestLength;
+    BYTE*           rgbEntityDigest;
+    TSM_BOOL        fDigestChecked;
+    TSM_BOOL        fDigestVerified;
+    UINT32          ulIssuerLength;
+    BYTE*           rgbIssuer;
+}TSM_EVENT_CERT;
+
+typedef struct tdTSM_VALIDATION
+{
+    TSM_VERSION     versionInfo;
+    UINT32          ulExternalDataLength;
+    BYTE*           rgbExternalData;
+    UINT32          ulDataLength;
+    BYTE*           rgbData;
+    UINT32          ulValidationLength;
+    BYTE*           rgbValdationData;
+}TSM_VALIDATION;
+
+typedef struct tdTSM_CALLBACK
+{
+    PVOID               callback;
+    PVOID               appData;
+    TSM_ALGORITHM_ID    alg;
+}TSM_CALLBACK;
+
+
+//////////////////////////////////////////////////////////////////////////
+// tss/tss_typedef.h
+//////////////////////////////////////////////////////////////////////////
+
+typedef TSS_NV_INDEX            TSM_NV_INDEX;
+typedef UINT32                  TCM_EXCHANGE_HANLDE;
+typedef UINT32                  TSM_EXCHANGE_HANLDE;
+typedef UINT32                  TSM_EXCHANGE_TAG;
+typedef UINT32                  TSM_EVENTTYPE;
+
+//////////////////////////////////////////////////////////////////////////
+// tss/tss_defines.h
+//////////////////////////////////////////////////////////////////////////
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
+// Attribute Flags, Subflags, and Values
+//////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////
+// Context object:
+//////////////////////////////////////////////////////////////////////////
+
+//
+// Values for the TSS_TSPATTRIB_CONTEXT_VERSION_MODE attribute
+//
+#define TSM_TSPATTRIB_CONTEXT_VERSION_AUTO          TSS_TSPATTRIB_CONTEXT_VERSION_AUTO
+// #define TSS_TSPATTRIB_CONTEXT_VERSION_V1_1 (0x00000002)
+// #define TSS_TSPATTRIB_CONTEXT_VERSION_V1_2 (0x00000003)
+
+//
+// Values for the subflag TSS_TSPATTRIB_CONTEXT_TRANS_CONTROL
+//
+#define TSM_TSPATTRIB_DISABLE_TRANSPORT             TSS_TSPATTRIB_DISABLE_TRANSPORT
+#define TSM_TSPATTRIB_ENABLE_TRANSPORT              TSS_TSPATTRIB_ENABLE_TRANSPORT
+
+//
+// Values for the TSS_TSPATTRIB_CONTEXT_CONNECTION_VERSION attribute
+//
+// #define TSS_CONNECTION_VERSION_1_1                      (0x00000001)
+// #define TSS_CONNECTION_VERSION_1_2                      (0x00000002)
+
+
+//
+// Values for TSS_TSPATTRIB_SECRET_HASH_MODE_POPUP subflag
+//
+#define TSM_TSPATTRIB_HASH_MODE_NOT_NULL            TSS_TSPATTRIB_HASH_MODE_NOT_NULL
+#define TSM_TSPATTRIB_HASH_MODE_NULL                TSS_TSPATTRIB_HASH_MODE_NULL
+
+//
+// TPM object:
+//
+
+//
+// Attributes:
+//
+#define TSM_TSPATTRIB_TCM_CALLBACK_COLLATEIDENTITY      TSS_TSPATTRIB_TPM_CALLBACK_COLLATEIDENTITY
+#define TSM_TSPATTRIB_TCM_CALLBACK_ACTIVATEIDENTITY        TSS_TSPATTRIB_TPM_CALLBACK_ACTIVATEIDENTITY
+#define TSM_TSPATTRIB_TCM_CREDENTIAL                    TSS_TSPATTRIB_TPM_CREDENTIAL
+
+//
+// Subflags for TSS_TSPATTRIB_TPM_ORDINAL_AUDIT_STATUS
+//
+#define TCM_CAP_PROP_TCM_CLEAR_ORDINAL_AUDIT        TPM_CAP_PROP_TPM_CLEAR_ORDINAL_AUDIT
+#define TCM_CAP_PROP_TCM_SET_ORDINAL_AUDIT          TPM_CAP_PROP_TPM_SET_ORDINAL_AUDIT
+
+//
+// Subflags for TSS_TSPATTRIB_TPM_CREDENTIAL
+//
+#define TSM_TCMATTRIB_EKCERT                        TSS_TPMATTRIB_EKCERT
+#define TSM_TCMATTRIB_TPM_CC                        TSS_TPMATTRIB_TPM_CC
+#define TSM_TCMATTRIB_PLATFORMCERT                  TSS_TPMATTRIB_PLATFORMCERT
+#define TSM_TCMATTRIB_PLATFORM_CC                   TSS_TPMATTRIB_PLATFORM_CC
+
+//
+// Policy object:
+//
+
+
+//
+// SubFlags for Flag TSS_TSPATTRIB_POLICY_SECRET_LIFETIME
+//
+#define TSM_SECRET_LIFETIME_ALWAYS                      TSS_SECRET_LIFETIME_ALWAYS
+#define TSM_SECRET_LIFETIME_COUNTER                     TSS_SECRET_LIFETIME_COUNTER
+#define TSM_SECRET_LIFETIME_TIMER                       TSS_SECRET_LIFETIME_TIMER
+#define TSM_TSPATTRIB_POLSECRET_LIFETIME_ALWAYS         TSS_TSPATTRIB_POLSECRET_LIFETIME_ALWAYS
+#define TSM_TSPATTRIB_POLSECRET_LIFETIME_COUNTER        TSS_TSPATTRIB_POLSECRET_LIFETIME_COUNTER
+#define TSM_TSPATTRIB_POLSECRET_LIFETIME_TIMER          TSS_TSPATTRIB_POLSECRET_LIFETIME_TIMER
+
+// Alternate names misspelled in the 1.1 TSS spec.
+#define TSM_TSPATTRIB_POLICYSECRET_LIFETIME_ALWAYS      TSS_TSPATTRIB_POLICYSECRET_LIFETIME_ALWAYS
+#define TSM_TSPATTRIB_POLICYSECRET_LIFETIME_COUNTER     TSS_TSPATTRIB_POLICYSECRET_LIFETIME_COUNTER
+#define TSM_TSPATTRIB_POLICYSECRET_LIFETIME_TIMER       TSS_TSPATTRIB_POLICYSECRET_LIFETIME_TIMER
+
+//
+// Subflags of TSS_TSPATTRIB_POLICY_DELEGATION_INFO
+//
+#define TSM_TSPATTRIB_POLDEL_TYPE           TSS_TSPATTRIB_POLDEL_TYPE
+#define TSM_TSPATTRIB_POLDEL_INDEX          TSS_TSPATTRIB_POLDEL_INDEX
+#define TSM_TSPATTRIB_POLDEL_PER1           TSS_TSPATTRIB_POLDEL_PER1
+#define TSM_TSPATTRIB_POLDEL_PER2           TSS_TSPATTRIB_POLDEL_PER2
+#define TSM_TSPATTRIB_POLDEL_LABEL          TSS_TSPATTRIB_POLDEL_LABEL
+#define TSM_TSPATTRIB_POLDEL_FAMILYID       TSS_TSPATTRIB_POLDEL_FAMILYID
+#define TSM_TSPATTRIB_POLDEL_VERCOUNT       TSS_TSPATTRIB_POLDEL_VERCOUNT
+#define TSM_TSPATTRIB_POLDEL_OWNERBLOB        TSS_TSPATTRIB_POLDEL_OWNERBLOB
+#define TSM_TSPATTRIB_POLDEL_KEYBLOB        TSS_TSPATTRIB_POLDEL_KEYBLOB
+
+//
+// Subflags of TSS_TSPATTRIB_POLICY_DELEGATION_PCR
+//
+#define TSM_TSPATTRIB_POLDELPCR_LOCALITY            TSS_TSPATTRIB_POLDELPCR_LOCALITY
+#define TSM_TSPATTRIB_POLDELPCR_DIGESTATRELEASE     TSS_TSPATTRIB_POLDELPCR_DIGESTATRELEASE
+#define TSM_TSPATTRIB_POLDELPCR_SELECTION           TSS_TSPATTRIB_POLDELPCR_SELECTION
+
+//
+// Values for the Policy TSS_TSPATTRIB_POLDEL_TYPE attribute
+//
+#define TSM_DELEGATIONTYPE_NONE             TSS_DELEGATIONTYPE_NONE
+#define TSM_DELEGATIONTYPE_OWNER            TSS_DELEGATIONTYPE_OWNER
+#define TSM_DELEGATIONTYPE_KEY              TSS_DELEGATIONTYPE_KEY
+
+//
+// EncData object:
+//
+
+//
+// Attributes
+//
+#define TSM_TSPATTRIB_ENCDATA_BLOB            TSS_TSPATTRIB_ENCDATA_BLOB
+#define TSM_TSPATTRIB_ENCDATA_PCR           TSS_TSPATTRIB_ENCDATA_PCR
+#define TSM_TSPATTRIB_ENCDATA_PCR_LONG      TSS_TSPATTRIB_ENCDATA_PCR_LONG
+#define TSM_TSPATTRIB_ENCDATA_SEAL          TSS_TSPATTRIB_ENCDATA_SEAL
+
+//
+// SubFlags for Flag TSS_TSPATTRIB_ENCDATA_BLOB
+//
+#define TSM_TSPATTRIB_ENCDATABLOB_BLOB      TSS_TSPATTRIB_ENCDATABLOB_BLOB
+
+//
+// SubFlags for Flag TSS_TSPATTRIB_ENCDATA_PCR
+//
+#define TSM_TSPATTRIB_ENCDATAPCR_DIGEST_ATCREATION  TSS_TSPATTRIB_ENCDATAPCR_DIGEST_ATCREATION
+#define TSM_TSPATTRIB_ENCDATAPCR_DIGEST_ATRELEASE   TSS_TSPATTRIB_ENCDATAPCR_DIGEST_ATRELEASE
+#define TSM_TSPATTRIB_ENCDATAPCR_SELECTION          TSS_TSPATTRIB_ENCDATAPCR_SELECTION
+// support typo from 1.1 headers
+#define TSM_TSPATTRIB_ENCDATAPCR_DIGEST_RELEASE     TSS_TSPATTRIB_ENCDATAPCR_DIGEST_RELEASE
+
+#define TSM_TSPATTRIB_ENCDATAPCRLONG_LOCALITY_ATCREATION    TSS_TSPATTRIB_ENCDATAPCRLONG_LOCALITY_ATCREATION
+#define TSM_TSPATTRIB_ENCDATAPCRLONG_LOCALITY_ATRELEASE     TSS_TSPATTRIB_ENCDATAPCRLONG_LOCALITY_ATRELEASE
+#define TSM_TSPATTRIB_ENCDATAPCRLONG_CREATION_SELECTION     TSS_TSPATTRIB_ENCDATAPCRLONG_CREATION_SELECTION
+#define TSM_TSPATTRIB_ENCDATAPCRLONG_RELEASE_SELECTION      TSS_TSPATTRIB_ENCDATAPCRLONG_RELEASE_SELECTION
+#define TSM_TSPATTRIB_ENCDATAPCRLONG_DIGEST_ATCREATION      TSS_TSPATTRIB_ENCDATAPCRLONG_DIGEST_ATCREATION
+#define TSM_TSPATTRIB_ENCDATAPCRLONG_DIGEST_ATRELEASE       TSS_TSPATTRIB_ENCDATAPCRLONG_DIGEST_ATRELEASE
+
+//
+// Attribute subflags TSS_TSPATTRIB_ENCDATA_SEAL
+//
+#define TSM_TSPATTRIB_ENCDATASEAL_PROTECT_MODE       TSS_TSPATTRIB_ENCDATASEAL_PROTECT_MODE
+
+//
+// Attribute values for 
+//    TSS_TSPATTRIB_ENCDATA_SEAL/TSS_TSPATTRIB_ENCDATASEAL_PROTECT_MODE
+//
+#define TSM_TSPATTRIB_ENCDATASEAL_NOPROTECT          TSS_TSPATTRIB_ENCDATASEAL_NOPROTECT
+#define TSM_TSPATTRIB_ENCDATASEAL_PROTECT            TSS_TSPATTRIB_ENCDATASEAL_PROTECT
+
+// Accounting for typos in original header files
+#define TSM_TSPATTRIB_ENCDATASEAL_NO_PROTECT         TSS_TSPATTRIB_ENCDATASEAL_NO_PROTECT
+
+//
+// NV object:
+//
+
+//
+// Attributes
+//
+#define TSM_TSPATTRIB_NV_INDEX                          TSS_TSPATTRIB_NV_INDEX
+#define TSM_TSPATTRIB_NV_PERMISSIONS                    TSS_TSPATTRIB_NV_PERMISSIONS
+#define TSM_TSPATTRIB_NV_STATE                          TSS_TSPATTRIB_NV_STATE
+#define TSM_TSPATTRIB_NV_DATASIZE                       TSS_TSPATTRIB_NV_DATASIZE
+#define TSM_TSPATTRIB_NV_PCR                            TSS_TSPATTRIB_NV_PCR
+
+#define TSM_TSPATTRIB_NVSTATE_READSTCLEAR               TSS_TSPATTRIB_NVSTATE_READSTCLEAR
+#define TSM_TSPATTRIB_NVSTATE_WRITESTCLEAR              TSS_TSPATTRIB_NVSTATE_WRITESTCLEAR
+#define TSM_TSPATTRIB_NVSTATE_WRITEDEFINE               TSS_TSPATTRIB_NVSTATE_WRITEDEFINE
+
+#define TSM_TSPATTRIB_NVPCR_READPCRSELECTION            TSS_TSPATTRIB_NVPCR_READPCRSELECTION
+#define TSM_TSPATTRIB_NVPCR_READDIGESTATRELEASE         TSS_TSPATTRIB_NVPCR_READDIGESTATRELEASE
+#define TSM_TSPATTRIB_NVPCR_READLOCALITYATRELEASE       TSS_TSPATTRIB_NVPCR_READLOCALITYATRELEASE
+#define TSM_TSPATTRIB_NVPCR_WRITEPCRSELECTION           TSS_TSPATTRIB_NVPCR_WRITEPCRSELECTION
+#define TSM_TSPATTRIB_NVPCR_WRITEDIGESTATRELEASE        TSS_TSPATTRIB_NVPCR_WRITEDIGESTATRELEASE
+#define TSM_TSPATTRIB_NVPCR_WRITELOCALITYATRELEASE      TSS_TSPATTRIB_NVPCR_WRITELOCALITYATRELEASE
+
+// NV index flags
+//
+// From the TPM spec, Part 2, Section 19.1.
+//
+//        3                   2                   1
+//      1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+//     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//     |T|P|U|D| resvd |   Purview     |          Index                |
+//     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//
+#define TSM_NV_TPM                  TSS_NV_TPM
+#define TSM_NV_PLATFORM             TSS_NV_PLATFORM
+#define TSM_NV_USER                 TSS_NV_USER
+#define TSM_NV_DEFINED              TSS_NV_DEFINED
+#define TSM_NV_MASK_TPM             TSS_NV_MASK_TPM
+#define TSM_NV_MASK_PLATFORM        TSS_NV_MASK_PLATFORM
+#define TSM_NV_MASK_USER            TSS_NV_MASK_USER
+#define TSM_NV_MASK_DEFINED         TSS_NV_MASK_DEFINED
+#define TSM_NV_MASK_RESERVED        TSS_NV_MASK_RESERVED
+#define TSM_NV_MASK_PURVIEW         TSS_NV_MASK_PURVIEW
+#define TSM_NV_MASK_INDEX           TSS_NV_MASK_INDEX
+#define TSM_NV_MASK_DOMAIN_BITS        (0xF0000000)
+
+// This is the index of the NV storage area where the number of sessions
+// per locality is stored.
+#define TSM_NV_INDEX_SESSIONS       TSS_NV_INDEX_SESSIONS
+
+//
+// MigData object:
+//
+
+//
+// Attributes
+//
+#define TSM_MIGATTRIB_MIGRATIONBLOB         TSS_MIGATTRIB_MIGRATIONBLOB
+#define TSM_MIGATTRIB_MIGRATIONTICKET       TSS_MIGATTRIB_MIGRATIONTICKET
+// #define TSM_MIGATTRIB_AUTHORITY_DATA        TSS_MIGATTRIB_AUTHORITY_DATA
+// #define TSM_MIGATTRIB_MIG_AUTH_DATA         TSS_MIGATTRIB_MIG_AUTH_DATA
+// #define TSM_MIGATTRIB_TICKET_DATA           TSS_MIGATTRIB_TICKET_DATA
+#define TSM_MIGATTRIB_PAYLOAD_TYPE          TSS_MIGATTRIB_PAYLOAD_TYPE
+
+//
+// Attribute subflags TSM_MIGATTRIB_MIGRATIONBLOB
+//
+#define TSM_MIGATTRIB_MIGRATION_XOR_BLOB            TSS_MIGATTRIB_MIGRATION_XOR_BLOB
+#define TSM_MIGATTRIB_MIGRATION_REWRAPPED_BLOB      TSS_MIGATTRIB_MIGRATION_REWRAPPED_BLOB
+// #define TSM_MIGATTRIB_MIG_MSALIST_PUBKEY_BLOB       TSS_MIGATTRIB_MIG_MSALIST_PUBKEY_BLOB
+// #define TSM_MIGATTRIB_MIG_AUTHORITY_PUBKEY_BLOB     TSS_MIGATTRIB_MIG_AUTHORITY_PUBKEY_BLOB
+#define TSM_MIGATTRIB_MIG_DESTINATION_PUBKEY_BLOB   TSS_MIGATTRIB_MIG_DESTINATION_PUBKEY_BLOB
+// #define TSM_MIGATTRIB_MIG_SOURCE_PUBKEY_BLOB        TSS_MIGATTRIB_MIG_SOURCE_PUBKEY_BLOB
+// #define TSM_MIGATTRIB_MIG_REWRAPPED_BLOB            TSS_MIGATTRIB_MIG_REWRAPPED_BLOB
+// #define TSM_MIGATTRIB_MIG_XOR_BLOB                  TSS_MIGATTRIB_MIG_XOR_BLOB
+#define TSM_MIGATTRIB_MIGRATION_SMS4_BLOB            (0x00000107)
+//
+// Attribute subflags TSS_MIGATTRIB_MIGRATIONTICKET
+//
+// none
+
+//
+// Attribute subflags TSS_MIGATTRIB_AUTHORITY_DATA
+//
+#define TSM_MIGATTRIB_AUTHORITY_DIGEST              TSS_MIGATTRIB_AUTHORITY_DIGEST
+#define TSM_MIGATTRIB_AUTHORITY_APPROVAL_HMAC       TSS_MIGATTRIB_AUTHORITY_APPROVAL_HMAC
+#define TSM_MIGATTRIB_AUTHORITY_MSALIST             TSS_MIGATTRIB_AUTHORITY_MSALIST
+
+//
+// Attribute subflags TSS_MIGATTRIB_MIG_AUTH_DATA
+//
+#define TSM_MIGATTRIB_MIG_AUTH_AUTHORITY_DIGEST     TSS_MIGATTRIB_MIG_AUTH_AUTHORITY_DIGEST
+#define TSM_MIGATTRIB_MIG_AUTH_DESTINATION_DIGEST   TSS_MIGATTRIB_MIG_AUTH_DESTINATION_DIGEST
+#define TSM_MIGATTRIB_MIG_AUTH_SOURCE_DIGEST        TSS_MIGATTRIB_MIG_AUTH_SOURCE_DIGEST
+
+//
+// Attribute subflags TSS_MIGATTRIB_TICKET_DATA
+//
+#define TSM_MIGATTRIB_TICKET_SIG_DIGEST         TSS_MIGATTRIB_TICKET_SIG_DIGEST
+#define TSM_MIGATTRIB_TICKET_SIG_VALUE          TSS_MIGATTRIB_TICKET_SIG_VALUE
+#define TSM_MIGATTRIB_TICKET_SIG_TICKET         TSS_MIGATTRIB_TICKET_SIG_TICKET
+#define TSM_MIGATTRIB_TICKET_RESTRICT_TICKET    TSS_MIGATTRIB_TICKET_RESTRICT_TICKET
+
+//
+// Attribute subflags TSS_MIGATTRIB_PAYLOAD_TYPE
+//
+#define TSM_MIGATTRIB_PT_MIGRATE_RESTRICTED     TSS_MIGATTRIB_PT_MIGRATE_RESTRICTED
+#define TSM_MIGATTRIB_PT_MIGRATE_EXTERNAL       TSS_MIGATTRIB_PT_MIGRATE_EXTERNAL
+
+//
+// Hash object:
+//
+
+//
+// Attributes
+//
+#define TSM_TSPATTRIB_HASH_IDENTIFIER           TSS_TSPATTRIB_HASH_IDENTIFIER
+#define TSM_TSPATTRIB_ALG_IDENTIFIER            TSS_TSPATTRIB_ALG_IDENTIFIER
+
+//
+// PCRs object:
+//
+
+//
+// Attributes
+//
+#define TSM_TSPATTRIB_PCRS_INFO                    TSS_TSPATTRIB_PCRS_INFO
+
+//
+// Subflags for TSS_TSPATTRIB_PCRS_INFO flag
+//
+#define TSM_TSPATTRIB_PCRSINFO_PCRSTRUCT        TSS_TSPATTRIB_PCRSINFO_PCRSTRUCT
+
+//***
+// Delegation Family object:
+//***
+
+//
+// Attributes
+//
+#define TSM_TSPATTRIB_DELFAMILY_STATE           TSS_TSPATTRIB_DELFAMILY_STATE
+#define TSM_TSPATTRIB_DELFAMILY_INFO            TSS_TSPATTRIB_DELFAMILY_INFO
+
+// DELFAMILY_STATE sub-attributes
+#define TSM_TSPATTRIB_DELFAMILYSTATE_LOCKED     TSS_TSPATTRIB_DELFAMILYSTATE_LOCKED
+#define TSM_TSPATTRIB_DELFAMILYSTATE_ENABLED    TSS_TSPATTRIB_DELFAMILYSTATE_ENABLED
+
+// DELFAMILY_INFO sub-attributes
+#define TSM_TSPATTRIB_DELFAMILYINFO_LABEL       TSS_TSPATTRIB_DELFAMILYINFO_LABEL
+#define TSM_TSPATTRIB_DELFAMILYINFO_VERCOUNT    TSS_TSPATTRIB_DELFAMILYINFO_VERCOUNT
+#define TSM_TSPATTRIB_DELFAMILYINFO_FAMILYID    TSS_TSPATTRIB_DELFAMILYINFO_FAMILYID
+
+// Bitmasks for the 'ulFlags' argument to Tspi_TPM_Delegate_CreateDelegation.
+// Only one bit used for now.
+#define TSM_DELEGATE_INCREMENTVERIFICATIONCOUNT  TSS_DELEGATE_INCREMENTVERIFICATIONCOUNT
+
+// Bitmasks for the 'ulFlags' argument to
+// Tspi_TPM_Delegate_CacheOwnerDelegation. Only 1 bit is used for now.
+#define TSM_DELEGATE_CACHEOWNERDELEGATION_OVERWRITEEXISTING     TSS_DELEGATE_CACHEOWNERDELEGATION_OVERWRITEEXISTING
+
+//
+// DAA Credential Object:
+//
+
+//
+// Attribute flags
+//
+#define TSM_TSPATTRIB_DAACRED_COMMIT                        TSS_TSPATTRIB_DAACRED_COMMIT
+#define TSM_TSPATTRIB_DAACRED_ATTRIB_GAMMAS                 TSS_TSPATTRIB_DAACRED_ATTRIB_GAMMAS
+#define TSM_TSPATTRIB_DAACRED_CREDENTIAL_BLOB               TSS_TSPATTRIB_DAACRED_CREDENTIAL_BLOB
+#define TSM_TSPATTRIB_DAACRED_CALLBACK_SIGN                 TSS_TSPATTRIB_DAACRED_CALLBACK_SIGN
+#define TSM_TSPATTRIB_DAACRED_CALLBACK_VERIFYSIGNATURE      TSS_TSPATTRIB_DAACRED_CALLBACK_VERIFYSIGNATURE
+
+//
+// Subflags for TSS_TSPATTRIB_DAACRED_COMMIT
+// 
+#define TSM_TSPATTRIB_DAACOMMIT_NUMBER          TSS_TSPATTRIB_DAACOMMIT_NUMBER
+#define TSM_TSPATTRIB_DAACOMMIT_SELECTION       TSS_TSPATTRIB_DAACOMMIT_SELECTION
+#define TSM_TSPATTRIB_DAACOMMIT_COMMITMENTS     TSS_TSPATTRIB_DAACOMMIT_COMMITMENTS
+
+//
+// Subflags for TSS_TSPATTRIB_DAACRED_ATTRIB_GAMMAS
+// 
+#define TSM_TSPATTRIB_DAAATTRIBGAMMAS_BLOB      TSS_TSPATTRIB_DAAATTRIBGAMMAS_BLOB
+
+//
+// DAA Issuer Key Object:
+//
+
+//
+// Attribute flags
+//
+#define TSM_TSPATTRIB_DAAISSUERKEY_BLOB         TSS_TSPATTRIB_DAAISSUERKEY_BLOB
+#define TSM_TSPATTRIB_DAAISSUERKEY_PUBKEY        TSS_TSPATTRIB_DAAISSUERKEY_PUBKEY
+
+//
+// Subflags for TSS_TSPATTRIB_DAAISSUERKEY_BLOB
+// 
+#define TSM_TSPATTRIB_DAAISSUERKEYBLOB_PUBLIC_KEY   TSS_TSPATTRIB_DAAISSUERKEYBLOB_PUBLIC_KEY
+#define TSM_TSPATTRIB_DAAISSUERKEYBLOB_SECRET_KEY   TSS_TSPATTRIB_DAAISSUERKEYBLOB_SECRET_KEY
+#define TSM_TSPATTRIB_DAAISSUERKEYBLOB_KEYBLOB      TSS_TSPATTRIB_DAAISSUERKEYBLOB_KEYBLOB
+#define TSM_TSPATTRIB_DAAISSUERKEYBLOB_PROOF        TSS_TSPATTRIB_DAAISSUERKEYBLOB_PROOF
+
+//
+// Subflags for TSS_TSPATTRIB_DAAISSUERKEY_PUBKEY
+// 
+#define TSM_TSPATTRIB_DAAISSUERKEYPUBKEY_NUM_ATTRIBS            TSS_TSPATTRIB_DAAISSUERKEYPUBKEY_NUM_ATTRIBS
+#define TSM_TSPATTRIB_DAAISSUERKEYPUBKEY_NUM_PLATFORM_ATTRIBS   TSS_TSPATTRIB_DAAISSUERKEYPUBKEY_NUM_PLATFORM_ATTRIBS
+#define TSM_TSPATTRIB_DAAISSUERKEYPUBKEY_NUM_ISSUER_ATTRIBS     TSS_TSPATTRIB_DAAISSUERKEYPUBKEY_NUM_ISSUER_ATTRIBS
+
+//*********
+// DAA Anonymity Revocation Key Object:
+//*********
+
+//
+// Attribute flags
+//
+#define TSM_TSPATTRIB_DAAARAKEY_BLOB            TSS_TSPATTRIB_DAAARAKEY_BLOB
+
+//
+// Subflags for TSS_TSPATTRIB_DAAARAKEY_BLOB
+// 
+#define TSM_TSPATTRIB_DAAARAKEYBLOB_PUBLIC_KEY  TSS_TSPATTRIB_DAAARAKEYBLOB_PUBLIC_KEY
+#define TSM_TSPATTRIB_DAAARAKEYBLOB_SECRET_KEY  TSS_TSPATTRIB_DAAARAKEYBLOB_SECRET_KEY
+#define TSM_TSPATTRIB_DAAARAKEYBLOB_KEYBLOB     TSS_TSPATTRIB_DAAARAKEYBLOB_KEYBLOB
+
+//
+// Structure payload flags for TSS_DAA_PSEUDONYM,
+// (TSS_DAA_PSEUDONYM.payloadFlag)
+//
+#define TSM_FLAG_DAA_PSEUDONYM_PLAIN            TSS_FLAG_DAA_PSEUDONYM_PLAIN
+#define TSM_FLAG_DAA_PSEUDONYM_ENCRYPTED        TSS_FLAG_DAA_PSEUDONYM_ENCRYPTED
+
+//
+// Key Object:
+//
+
+
+//
+// SubFlags for Flag TSS_TSPATTRIB_KEY_BLOB
+//
+#define TSM_TSPATTRIB_KEYBLOB_BLOB          TSS_TSPATTRIB_KEYBLOB_BLOB
+#define TSM_TSPATTRIB_KEYBLOB_PUBLIC_KEY    TSS_TSPATTRIB_KEYBLOB_PUBLIC_KEY
+#define TSM_TSPATTRIB_KEYBLOB_PRIVATE_KEY   TSS_TSPATTRIB_KEYBLOB_PRIVATE_KEY
+
+//
+// SubFlags for Flag TSS_TSPATTRIB_KEY_INFO
+//
+#define TSM_TSPATTRIB_KEYINFO_SIZE              TSS_TSPATTRIB_KEYINFO_SIZE
+#define TSM_TSPATTRIB_KEYINFO_KEYFLAGS          TSS_TSPATTRIB_KEYINFO_KEYFLAGS
+#define TSM_TSPATTRIB_KEYINFO_AUTHUSAGE         TSS_TSPATTRIB_KEYINFO_AUTHUSAGE
+#define TSM_TSPATTRIB_KEYINFO_ALGORITHM         TSS_TSPATTRIB_KEYINFO_ALGORITHM
+#define TSM_TSPATTRIB_KEYINFO_SIGSCHEME         TSS_TSPATTRIB_KEYINFO_SIGSCHEME
+#define TSM_TSPATTRIB_KEYINFO_ENCSCHEME         TSS_TSPATTRIB_KEYINFO_ENCSCHEME
+#define TSM_TSPATTRIB_KEYINFO_MIGRATABLE        TSS_TSPATTRIB_KEYINFO_MIGRATABLE
+#define TSM_TSPATTRIB_KEYINFO_REDIRECTED        TSS_TSPATTRIB_KEYINFO_REDIRECTED
+#define TSM_TSPATTRIB_KEYPCR_REDIRECTED         TSM_TSPATTRIB_KEYINFO_REDIRECTED
+#define TSM_TSPATTRIB_KEYINFO_VOLATILE          TSS_TSPATTRIB_KEYINFO_VOLATILE
+#define TSM_TSPATTRIB_KEYINFO_AUTHDATAUSAGE     TSS_TSPATTRIB_KEYINFO_AUTHDATAUSAGE
+#define TSM_TSPATTRIB_KEYINFO_VERSION           TSS_TSPATTRIB_KEYINFO_VERSION
+#define TSM_TSPATTRIB_KEYINFO_CMK               TSS_TSPATTRIB_KEYINFO_CMK
+//                                                          // is certified
+//                                                          // migratable
+#define TSM_TSPATTRIB_KEYINFO_KEYSTRUCT         TSS_TSPATTRIB_KEYINFO_KEYSTRUCT
+//                                                          // used for this key
+//                                                          // (TPM_KEY or 
+//                                                          // TPM_KEY12)
+#define TSM_TSPATTRIB_KEYCONTROL_OWNEREVICT     TSS_TSPATTRIB_KEYCONTROL_OWNEREVICT
+//                              // of owner evict flag
+
+//
+// SubFlags for Flag TSS_TSPATTRIB_RSAKEY_INFO
+//
+#define TSM_TSPATTRIB_KEYINFO_RSA_EXPONENT      TSS_TSPATTRIB_KEYINFO_RSA_EXPONENT
+#define TSM_TSPATTRIB_KEYINFO_RSA_MODULUS       TSS_TSPATTRIB_KEYINFO_RSA_MODULUS
+#define TSM_TSPATTRIB_KEYINFO_RSA_KEYSIZE       TSS_TSPATTRIB_KEYINFO_RSA_KEYSIZE
+#define TSM_TSPATTRIB_KEYINFO_RSA_PRIMES        TSS_TSPATTRIB_KEYINFO_RSA_PRIMES
+
+//
+// key flag definitions
+//
+#define TSM_KEYFLAG_REDIRECTION                     TSS_KEYFLAG_REDIRECTION
+#define TSM_TSPATTRIB_KEYPCR_SELECTION              TSS_TSPATTRIB_KEYPCR_SELECTION
+
+//
+// SubFlags for TSS_TSPATTRIB_KEY_REGISTER
+//
+#define TSM_TSPATTRIB_KEYREGISTER_USER          TSS_TSPATTRIB_KEYREGISTER_USER
+#define TSM_TSPATTRIB_KEYREGISTER_SYSTEM        TSS_TSPATTRIB_KEYREGISTER_SYSTEM
+#define TSM_TSPATTRIB_KEYREGISTER_NO            TSS_TSPATTRIB_KEYREGISTER_NO
+
+//
+// SubFlags for Flag TSS_TSPATTRIB_KEY_CMKINFO
+//
+#define TSM_TSPATTRIB_KEYINFO_CMK_MA_APPROVAL           TSS_TSPATTRIB_KEYINFO_CMK_MA_APPROVAL
+#define TSM_TSPATTRIB_KEYINFO_CMK_MA_DIGEST             TSS_TSPATTRIB_KEYINFO_CMK_MA_DIGEST
+
+//
+// Attribute Values
+//
+
+
+//
+// key usage definitions
+// Values intentionally moved away from corresponding TPM values to avoid
+// possible misuse
+//
+
+#define TSM_KEYFLAG_MIGRATABLE              TSS_KEYFLAG_MIGRATABLE
+#define TSM_KEYFLAG_VOLATILEKEY             TSS_KEYFLAG_VOLATILEKEY
+// #define TSM_KEYFLAG_CERTIFIED_MIGRATABLE    TSS_KEYFLAG_CERTIFIED_MIGRATABLE
+
+
+
+//
+// key signature scheme definitions
+//
+#define TSM_SS_NONE                     TSS_SS_NONE
+// #define TSM_SS_RSASSAPKCS1V15_SHA1      TSS_SS_RSASSAPKCS1V15_SHA1
+// #define TSM_SS_RSASSAPKCS1V15_DER       TSS_SS_RSASSAPKCS1V15_DER
+#define TSM_SS_SM2                       (0x13)
+//
+// key encryption scheme definitions
+//
+#define TSM_ES_NONE                     TSS_ES_NONE
+// #define TSM_ES_RSAESPKCSV15             TSS_ES_RSAESPKCSV15
+// #define TSM_ES_RSAESOAEP_SHA1_MGF1      TSS_ES_RSAESOAEP_SHA1_MGF1
+// #define TSM_ES_SYM_CNT                  TSS_ES_SYM_CNT
+// #define TSM_ES_SYM_OFB                  TSS_ES_SYM_OFB
+// #define TSM_ES_SYM_CBC_PKCS5PAD         TSS_ES_SYM_CBC_PKCS5PAD
+#define TSM_ES_SM2                      (0x16)
+#define TSM_ES_SMS4_CBC                 (0x17)
+#define TSM_ES_SMS4_ECB                 (0x18)
+
+
+//
+// migration scheme definitions
+// Values intentionally moved away from corresponding TPM values to avoid
+// possible misuse
+//
+#define TSM_MS_MIGRATE                      TSS_MS_MIGRATE
+#define TSM_MS_REWRAP                       TSS_MS_REWRAP
+#define TSM_MS_MAINT                        TSS_MS_MAINT
+#define TSM_MS_RESTRICT_MIGRATE             TSS_MS_RESTRICT_MIGRATE
+#define TSM_MS_RESTRICT_APPROVE_DOUBLE      TSS_MS_RESTRICT_APPROVE_DOUBLE
+#define TSM_MS_RESTRICT_MIGRATE_EXTERNAL    TSS_MS_RESTRICT_MIGRATE_EXTERNAL
+
+//
+// TPM key authorization
+// Values intentionally moved away from corresponding TPM values to avoid
+// possible misuse
+//
+#define TSM_KEYAUTH_AUTH_NEVER              TSS_KEYAUTH_AUTH_NEVER
+#define TSM_KEYAUTH_AUTH_ALWAYS             TSS_KEYAUTH_AUTH_ALWAYS
+#define TSM_KEYAUTH_AUTH_PRIV_USE_ONLY      TSS_KEYAUTH_AUTH_PRIV_USE_ONLY
+
+
+//
+// Flags for TPM status information (GetStatus and SetStatus)
+//
+#define TSM_TCMSTATUS_DISABLEOWNERCLEAR     TSS_TPMSTATUS_DISABLEOWNERCLEAR
+#define TSM_TCMSTATUS_DISABLEFORCECLEAR     TSS_TPMSTATUS_DISABLEFORCECLEAR
+#define TSM_TCMSTATUS_DISABLED              TSS_TPMSTATUS_DISABLED
+#define TSM_TCMSTATUS_DEACTIVATED           TSS_TPMSTATUS_DEACTIVATED
+#define TSM_TCMSTATUS_OWNERSETDISABLE       TSS_TPMSTATUS_OWNERSETDISABLE
+
+#define TSM_TCMSTATUS_SETOWNERINSTALL       TSS_TPMSTATUS_SETOWNERINSTALL
+
+#define TSM_TCMSTATUS_DISABLEPUBEKREAD          TSS_TPMSTATUS_DISABLEPUBEKREAD
+// #define TSM_TCMSTATUS_ALLOWMAINTENANCE          TSS_TPMSTATUS_ALLOWMAINTENANCE
+#define TSM_TCMSTATUS_PHYSPRES_LIFETIMELOCK     TSS_TPMSTATUS_PHYSPRES_LIFETIMELOCK
+#define TSM_TCMSTATUS_PHYSPRES_HWENABLE         TSS_TPMSTATUS_PHYSPRES_HWENABLE
+#define TSM_TCMSTATUS_PHYSPRES_CMDENABLE        TSS_TPMSTATUS_PHYSPRES_CMDENABLE
+#define TSM_TCMSTATUS_PHYSPRES_LOCK             TSS_TPMSTATUS_PHYSPRES_LOCK
+#define TSM_TCMSTATUS_PHYSPRESENCE              TSS_TPMSTATUS_PHYSPRESENCE
+#define TSM_TCMSTATUS_PHYSICALDISABLE           TSS_TPMSTATUS_PHYSICALDISABLE
+
+#define TSM_TCMSTATUS_CEKP_USED                 TSS_TPMSTATUS_CEKP_USED
+
+#define TSM_TCMSTATUS_PHYSICALSETDEACTIVATED    TSS_TPMSTATUS_PHYSICALSETDEACTIVATED
+
+#define TSM_TCMSTATUS_SETTEMPDEACTIVATED        TSS_TPMSTATUS_SETTEMPDEACTIVATED
+// 
+// #define TSM_TCMSTATUS_POSTINITIALISE                TSS_TPMSTATUS_POSTINITIALISE
+// #define TSM_TCMSTATUS_TCMPOST                       TSS_TPMSTATUS_TPMPOST
+// #define TSM_TCMSTATUS_TCMPOSTLOCK                   TSS_TPMSTATUS_TPMPOSTLOCK
+// #define TSM_TCMSTATUS_DISABLEPUBSRKREAD             TSS_TPMSTATUS_DISABLEPUBSRKREAD
+// #define TSM_TCMSTATUS_MAINTENANCEUSED               TSS_TPMSTATUS_MAINTENANCEUSED
+// #define TSM_TCMSTATUS_OPERATORINSTALLED             TSS_TPMSTATUS_OPERATORINSTALLED
+#define TSM_TCMSTATUS_OPERATOR_INSTALLED            TSS_TPMSTATUS_OPERATOR_INSTALLED
+// #define TSM_TCMSTATUS_FIPS                          TSS_TPMSTATUS_FIPS
+// #define TSM_TCMSTATUS_ENABLEREVOKEEK                TSS_TPMSTATUS_ENABLEREVOKEEK
+#define TSM_TCMSTATUS_ENABLE_REVOKEEK               TSS_TPMSTATUS_ENABLE_REVOKEEK
+#define TSM_TCMSTATUS_NV_LOCK                       TSS_TPMSTATUS_NV_LOCK
+// #define TSM_TCMSTATUS_TCM_ESTABLISHED               TSS_TPMSTATUS_TPM_ESTABLISHED
+// #define TSM_TCMSTATUS_RESETLOCK                        TSS_TPMSTATUS_RESETLOCK
+// #define TSM_TCMSTATUS_DISABLE_FULL_DA_LOGIC_INFO    TSS_TPMSTATUS_DISABLE_FULL_DA_LOGIC_INFO
+/*
+//
+// Capability flag definitions
+//
+// TPM capabilities            
+//
+#define TSM_TCMCAP_ORD                  TSS_TPMCAP_ORD
+#define TSM_TCMCAP_ALG                  TSS_TPMCAP_ALG
+#define TSM_TCMCAP_FLAG                 TSS_TPMCAP_FLAG
+#define TSM_TCMCAP_PROPERTY             TSS_TPMCAP_PROPERTY
+//#define TSM_TCMCAP_VERSION              TSS_TPMCAP_VERSION
+// #define TSM_TCMCAP_VERSION_VAL          TSS_TPMCAP_VERSION_VAL
+#define TSM_TCMCAP_NV_LIST              TSS_TPMCAP_NV_LIST
+#define TSM_TCMCAP_NV_INDEX             TSS_TPMCAP_NV_INDEX
+#define TSM_TCMCAP_MFR                  TSS_TPMCAP_MFR
+#define TSM_TCMCAP_SYM_MODE             TSS_TPMCAP_SYM_MODE
+#define TSM_TCMCAP_HANDLE               TSS_TPMCAP_HANDLE
+#define TSM_TCMCAP_TRANS_ES             TSS_TPMCAP_TRANS_ES
+#define TSM_TCMCAP_AUTH_ENCRYPT         TSS_TPMCAP_AUTH_ENCRYPT
+// #define TSM_TCMCAP_SET_PERM_FLAGS       TSS_TPMCAP_SET_PERM_FLAGS
+
+
+#define TSM_TCMCAP_DA_LOGIC             TSS_TPMCAP_DA_LOGIC
+*/
+//
+// Resource type flags
+// Sub-Capability Flags for TSS_TPMCAP_HANDLE
+//
+#define TSM_RT_KEY          TSS_RT_KEY
+#define TSM_RT_AUTH         TSS_RT_AUTH
+#define TSM_RT_TRANS        TSS_RT_TRANS
+#define TSM_RT_COUNTER      TSS_RT_COUNTER
+
+//
+// Sub-Capability Flags TSS-CoreService-Capabilities
+//
+#define TSM_TCSCAP_PROP_MANUFACTURER_STR    TSS_TCSCAP_PROP_MANUFACTURER_STR
+#define TSM_TCSCAP_PROP_MANUFACTURER_ID     TSS_TCSCAP_PROP_MANUFACTURER_ID
+#define TSM_TCSCAP_PLATFORM_VERSION         TSS_TCSCAP_PLATFORM_VERSION
+#define TSM_TCSCAP_PLATFORM_TYPE            TSS_TCSCAP_PLATFORM_TYPE
+#define TSM_TCSCAP_TRANS_EXCLUSIVE          TSS_TCSCAP_TRANS_EXCLUSIVE
+#define TSM_TCSCAP_PROP_HOST_PLATFORM       TSS_TCSCAP_PROP_HOST_PLATFORM
+#define TSM_TCSCAP_PROP_ALL_PLATFORMS       TSS_TCSCAP_PROP_ALL_PLATFORMS
+
+
+// Sub-Capability Flags for TSS_TSPCAP_MANUFACTURER
+//
+#define TSM_TSPCAP_PROP_MANUFACTURER_STR        TSS_TSPCAP_PROP_MANUFACTURER_STR
+#define TSM_TSPCAP_PROP_MANUFACTURER_ID         TSS_TSPCAP_PROP_MANUFACTURER_ID
+
+// Sub-Capability Flags for TSS_TSPCAP_PLATFORM_INFO
+//
+#define TSM_TSPCAP_PLATFORM_TYPE                TSS_TSPCAP_PLATFORM_TYPE
+#define TSM_TSPCAP_PLATFORM_VERSION             TSS_TSPCAP_PLATFORM_VERSION
+
+//
+// Event type definitions
+//
+#define TSM_EV_CODE_CERT                TSS_EV_CODE_CERT
+#define TSM_EV_CODE_NOCERT              TSS_EV_CODE_NOCERT
+#define TSM_EV_XML_CONFIG               TSS_EV_XML_CONFIG
+#define TSM_EV_NO_ACTION                TSS_EV_NO_ACTION
+#define TSM_EV_SEPARATOR                TSS_EV_SEPARATOR
+#define TSM_EV_ACTION                   TSS_EV_ACTION
+#define TSM_EV_PLATFORM_SPECIFIC        TSS_EV_PLATFORM_SPECIFIC
+
+
+//
+// TSP random number limits
+//
+#define TSM_TSPCAP_RANDOMLIMIT          TSS_TSPCAP_RANDOMLIMIT
+
+//
+// UUIDs
+//
+// Errata: This are not in the spec
+#define TSM_UUID_SRK        TSS_UUID_SRK
+#define TSM_UUID_SK         TSS_UUID_SK
+#define TSM_UUID_RK         TSS_UUID_RK
+#define TSM_UUID_CRK        TSS_UUID_CRK
+#define TSM_UUID_USK1       TSS_UUID_USK1
+#define TSM_UUID_USK2       TSS_UUID_USK2
+#define TSM_UUID_USK3       TSS_UUID_USK3
+#define TSM_UUID_USK4       TSS_UUID_USK4
+#define TSM_UUID_USK5       TSS_UUID_USK5
+#define TSM_UUID_USK6       TSS_UUID_USK6
+
+// macro to derive UUIDs for keys whose "OwnerEvict" key is set.
+#define TSM_UUID_OWNEREVICT(i)      TSS_UUID_OWNEREVICT(i)
+
+
+//
+// TPM well-known secret
+//
+#define TSM_WELL_KNOWN_SECRET       TSS_WELL_KNOWN_SECRET
+
+
+// Values for the "direction" parameters in the Tspi_PcrComposite_XX functions.
+#define TSM_PCRS_DIRECTION_CREATION     TSS_PCRS_DIRECTION_CREATION
+#define TSM_PCRS_DIRECTION_RELEASE      TSS_PCRS_DIRECTION_RELEASE
+
+
+//
+// TSS blob version definition for ASN.1 blobs
+//
+#define TSM_BLOB_STRUCT_VERSION         TSS_BLOB_STRUCT_VERSION
+
+//
+// TSS blob type definitions for ASN.1 blobs
+//
+#define TSM_BLOB_TYPE_KEY                   TSS_BLOB_TYPE_KEY
+#define TSM_BLOB_TYPE_PUBKEY                TSS_BLOB_TYPE_PUBKEY
+#define TSM_BLOB_TYPE_MIGKEY                TSS_BLOB_TYPE_MIGKEY
+#define TSM_BLOB_TYPE_SEALEDDATA            TSS_BLOB_TYPE_SEALEDDATA
+#define TSM_BLOB_TYPE_BOUNDDATA             TSS_BLOB_TYPE_BOUNDDATA
+#define TSM_BLOB_TYPE_MIGTICKET             TSS_BLOB_TYPE_MIGTICKET
+#define TSM_BLOB_TYPE_PRIVATEKEY            TSS_BLOB_TYPE_PRIVATEKEY
+#define TSM_BLOB_TYPE_PRIVATEKEY_MOD1       TSS_BLOB_TYPE_PRIVATEKEY_MOD1
+#define TSM_BLOB_TYPE_RANDOM_XOR            TSS_BLOB_TYPE_RANDOM_XOR
+#define TSM_BLOB_TYPE_CERTIFY_INFO          TSS_BLOB_TYPE_CERTIFY_INFO
+#define TSM_BLOB_TYPE_KEY_1_2               TSS_BLOB_TYPE_KEY_1_2
+#define TSM_BLOB_TYPE_CERTIFY_INFO_2        TSS_BLOB_TYPE_CERTIFY_INFO_2
+#define TSM_BLOB_TYPE_CMK_MIG_KEY           TSS_BLOB_TYPE_CMK_MIG_KEY
+#define TSM_BLOB_TYPE_CMK_BYTE_STREAM       TSS_BLOB_TYPE_CMK_BYTE_STREAM
+
+
+
+//
+// Values for TPM_CMK_DELEGATE bitmasks
+// For now these are exactly the same values as the corresponding
+// TPM_CMK_DELEGATE_* bitmasks.
+//
+#define TSM_CMK_DELEGATE_SIGNING        TSS_CMK_DELEGATE_SIGNING
+#define TSM_CMK_DELEGATE_STORAGE        TSS_CMK_DELEGATE_STORAGE
+#define TSM_CMK_DELEGATE_BIND           TSS_CMK_DELEGATE_BIND
+#define TSM_CMK_DELEGATE_LEGACY         TSS_CMK_DELEGATE_LEGACY
+#define TSM_CMK_DELEGATE_MIGRATE        TSS_CMK_DELEGATE_MIGRATE
+
+
+//
+// Constants for DAA
+//
+#define TSM_DAA_LENGTH_N                TSS_DAA_LENGTH_N
+#define TSM_DAA_LENGTH_F                TSS_DAA_LENGTH_F
+#define TSM_DAA_LENGTH_E                TSS_DAA_LENGTH_E
+#define TSM_DAA_LENGTH_E_PRIME          TSS_DAA_LENGTH_E_PRIME
+#define TSM_DAA_LENGTH_V                TSS_DAA_LENGTH_V
+#define TSM_DAA_LENGTH_SAFETY           TSS_DAA_LENGTH_SAFETY
+#define TSM_DAA_LENGTH_HASH             TSS_DAA_LENGTH_HASH
+#define TSM_DAA_LENGTH_S                TSS_DAA_LENGTH_S
+#define TSM_DAA_LENGTH_GAMMA            TSS_DAA_LENGTH_GAMMA
+#define TSM_DAA_LENGTH_RHO              TSS_DAA_LENGTH_RHO
+#define TSM_DAA_LENGTH_MFG1_GAMMA       TSS_DAA_LENGTH_MFG1_GAMMA
+#define TSM_DAA_LENGTH_MGF1_AR          TSS_DAA_LENGTH_MGF1_AR
+
+
+//////////////////////////////////////////////////////////////////////////
+// tss/tcs_structs.h
+//////////////////////////////////////////////////////////////////////////
+
+
+typedef struct tdTCM_AUTH
+{
+    TCS_AUTHHANDLE  AuthHandle;
+    TCM_NONCE       NonceOdd;   // system  
+    TCM_NONCE       NonceEven;   // TPM   
+    TSM_BOOL        fContinueAuthSession;
+    TCM_AUTHDATA    HMAC;
+
+	// 非标准,以下成员用于TCM的APCreate,
+//	UINT16 entityType;
+//	UINT32 entityValue;
+//	UINT32 AntiReplaySeq;
+//	BYTE   ShareSecret[32];
+
+} TCM_AUTH;
+
+typedef TCM_AUTH                TSM_AUTH;
+
+typedef struct tdTCS_LOADKEY_INFO
+{
+    TSM_UUID   keyUUID;
+    TSM_UUID   parentKeyUUID;
+    TCM_DIGEST  paramDigest; // SCH digest of the TPM_LoadKey
+                             // Command input parameters
+                             // As defined in TPM Main Specification
+    TCM_AUTH   authData;     // Data regarding a valid auth
+                             // Session including the
+                             // HMAC digest
+} TCS_LOADKEY_INFO;
+
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
+
+typedef TCM_SECRET              TSM_SECRET;
+typedef TCM_PHYSICAL_PRESENCE   TSM_PHYSICAL_PRESENCE;
+typedef TCM_CAPABILITY_AREA     TSM_CAPABILITY_AREA;
+typedef TCM_ENCAUTH             TSM_ENCAUTH;
+
+#pragma pack(pop)
+
+#endif

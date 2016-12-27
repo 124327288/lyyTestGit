@@ -1,0 +1,33 @@
+; tyCSP.def : Declares the module parameters for the DLL.
+
+LIBRARY      "tyCSP"
+DESCRIPTION  'TY Cryptographic Service Provider'
+
+EXPORTS
+    ; Explicit exports can go here
+
+	CPAcquireContext		@1 
+	CPReleaseContext		@2 
+	CPGetProvParam			@3 
+	CPSetProvParam			@4 
+	CPGenKey				@5
+	CPDuplicateKey			@6 
+	CPDeriveKey				@7 
+	CPDestroyKey			@8 
+	CPGetKeyParam			@9 
+	CPSetKeyParam			@10 
+	CPExportKey				@11 
+	CPImportKey				@12 
+	CPGenRandom				@13 
+	CPGetUserKey			@14 
+	CPEncrypt				@15 
+	CPDecrypt				@16 
+	CPCreateHash			@17 
+	CPDuplicateHash			@18
+	CPDestroyHash			@19 
+	CPGetHashParam			@20 
+	CPSetHashParam			@21 
+	CPHashData				@22 
+	CPHashSessionKey		@23 
+	CPSignHash				@24 
+	CPVerifySignature		@25 

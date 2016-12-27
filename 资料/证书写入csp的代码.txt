@@ -1,0 +1,76 @@
+HCRYPTPROV  hProv;
+HCRYPTKEY   hKey, hExKey;
+BYTE*       pKeyBlob = NULL, *pPriBlob = NULL;
+DWORD       dwBlobLen, dwPriLen, dwErr = 0;
+PCCERT_CONTEXT pCertContext;
+if(! CryptAcquireContext(&hProv, TEXT("VKEKeyTest"), NULL, PROV_RSA_FULL, 0) )
+{
+if(GetLastError() == NTE_BAD_KEYSET)
+{
+if( !CryptAcquireContext(&hProv, TEXT("VKEKeyTest"), NULL, PROV_RSA_FULL, CRYPT_NEWKEYSET))
+{
+::MessageBox(NULL, TEXT("Create Keyset failed"), TEXT("Error"), MB_OK);
+return;
+}
+}
+}
+if(! CryptGetUserKey(hProv, AT_SIGNATURE, &hKey))
+{
+if(GetLastError() == NTE_NO_KEY)
+CryptGenKey(hProv, AT_SIGNATURE, CRYPT_EXPORTABLE, &hKey);
+}
+if(pKeyBlob == NULL)
+CryptExportKey(hKey, NULL, PUBLICKEYBLOB, 0, NULL, &dwBlobLen);
+if(dwBlobLen)
+{ 
+pKeyBlob = (BYTE*)malloc(dwBlobLen);
+CryptExportKey(hKey, NULL, PUBLICKEYBLOB, 0, pKeyBlob, &dwBlobLen);
+}
+if(pPriBlob == NULL)
+if( !CryptExportKey(hKey, NULL, PRIVATEKEYBLOB, 0, NULL, &dwPriLen))
+dwErr = GetLastError();
+if(dwPriLen)
+{
+pPriBlob = (BYTE*)malloc(dwPriLen);
+CryptExportKey(hKey, NULL, PRIVATEKEYBLOB, 0, pPriBlob, &dwPriLen);
+}
+if(hProv)
+CryptReleaseContext(hProv, 0);
+
+
+BYTE pBinByte[8192] = {0};
+unsigned long binBytes = 4096;
+CryptStringToBinary(pCert,896, CRYPT_STRING_BASE64, pBinByte, &binBytes, NULL, NULL);
+fp = fopen("pBinByte.txt","wb");
+fwrite(pBinByte, 1, binBytes, fp);
+fclose(fp);
+pCertContext = CertCreateCertificateContext(X509_ASN_ENCODING, (BYTE*)pBinByte, binBytes);
+if(pCertContext == NULL)
+{
+dwErr = GetLastError();
+CertFreeCertificateContext(pCertContext);
+}
+
+HCRYPTPROV  hCryptProv;
+HCRYPTKEY   hImpKey, hImpKey1;
+if(! CryptAcquireContext(&hCryptProv, TEXT("VKEKeyTest"), CSP_NAME, PROV_RSA_FULL, 0) )
+{
+if(GetLastError() == NTE_BAD_KEYSET)
+{
+if( !CryptAcquireContext(&hCryptProv, TEXT("VKEKeyTest"), CSP_NAME, PROV_RSA_FULL, CRYPT_NEWKEYSET))
+{
+::MessageBox(NULL, TEXT("Create Keyset failed"), TEXT("Error"), MB_OK);
+return;
+}
+}
+}
+
+if( !CryptImportKey(hCryptProv, pPriBlob, dwPriLen, NULL, 0, &hImpKey))
+{
+dwErr = GetLastError();
+}
+delete[] pPriBlob;
+
+if(!CryptSetKeyParam(hImpKey1, KP_CERTIFICATE, pCertContext->pbCertEncoded, 0))
+dwErr = GetLastError();
+CryptReleaseContext(hProv, 0);
